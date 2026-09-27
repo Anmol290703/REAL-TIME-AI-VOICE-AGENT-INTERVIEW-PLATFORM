@@ -2,6 +2,7 @@
 
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
@@ -26,10 +27,10 @@ export async function signUp(params: SignUpParams){
             success: true,
             message: "Account created successfully. Please sign in."
         }
-    } catch(e: any) {
+    } catch(e: unknown) {
         console.error("Error creating a user", e);
 
-        if(e.code === "auth/email-already-exists"){
+        if(typeof e === "object" && e && "code" in e && e.code === "auth/email-already-exists"){
             return {
                 success: false,
                 message: "This eamil is already in use."
@@ -56,7 +57,22 @@ export async function signIn(params: SignInParams) {
             }
         }
 
+        const userDoc = db.collection('users').doc(userRecord.uid);
+        const userSnapshot = await userDoc.get();
+
+        if(!userSnapshot.exists) {
+            await userDoc.set({
+                name: userRecord.displayName || email.split("@")[0],
+                email,
+            })
+        }
+
         await setSessionCookie(idToken);
+
+        return {
+            success: true,
+            message: "Signed in successfully."
+        }
     } catch(e) {
         console.log(e);
 
@@ -114,3 +130,9 @@ export async function isAuthenticated(){
     return !!user;
 }
 
+export async function signOut(){
+    const cookieStore = await cookies();
+
+    cookieStore.delete('session');
+    redirect("/sign-in");
+}

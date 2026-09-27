@@ -77,12 +77,18 @@ const AuthForm = ({ type }: {type: FormType}) => {
           return;
         }
 
-        await signIn({
+        const result = await signIn({
           email, idToken
-        })
+        });
 
-        toast.success("Signed In successfully.")
-        router.push("/");
+        if(!result?.success) {
+          toast.error(result?.message || "Sign in failed.");
+          return;
+        }
+
+        toast.success("Signed In successfully.");
+        router.replace("/");
+        router.refresh();
       }
     } catch(error) {
         console.log(error);
@@ -97,7 +103,9 @@ const AuthForm = ({ type }: {type: FormType}) => {
       <div className="flex flex-col gap-6 card py-14 px-10">
         <div className="flex flex-row gap-2 justify-center">
           <Image src="/logo.svg" alt="logo" height={32} width={38} />
-          <h2 className="text-primary-100">PrepWise</h2>
+          <h2 className="text-primary-100 text-center text-lg leading-tight sm:text-xl">
+            Real Time AI Voice Agent Interview Platform
+          </h2>
         </div>
 
         <h3>Practice Job Interviews with AI</h3>

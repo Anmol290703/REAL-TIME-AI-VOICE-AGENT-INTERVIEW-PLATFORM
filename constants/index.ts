@@ -2,6 +2,8 @@ import { CreateAssistantDTO } from "@vapi-ai/web/dist/api";
 import { z } from "zod";
 
 export const mappings = {
+  java: "java",
+  python: "python",
   "react.js": "react",
   reactjs: "react",
   react: "react",
@@ -22,7 +24,14 @@ export const mappings = {
   mongoose: "mongoose",
   mysql: "mysql",
   postgresql: "postgresql",
+  c: "c",
+  "c++": "cplusplus",
+  cpp: "cplusplus",
+  cplusplus: "cplusplus",
   sqlite: "sqlite",
+  linux: "linux",
+  bash: "bash",
+  shell: "bash",
   firebase: "firebase",
   docker: "docker",
   kubernetes: "kubernetes",
@@ -124,12 +133,19 @@ export const interviewer: CreateAssistantDTO = {
         content: `You are a professional job interviewer conducting a real-time voice interview with a candidate. Your goal is to assess their qualifications, motivation, and fit for the role.
 
 Interview Guidelines:
+Ask exactly the main questions listed below. The list contains the full interview:
+- Ask one listed question at a time.
+- Do not invent extra main questions.
+- Do not skip any listed question.
+- If an answer is vague, you may ask one brief clarification sentence and then continue.
+- After the final listed question, close the interview politely.
+
 Follow the structured question flow:
 {{questions}}
 
 Engage naturally & react appropriately:
 Listen actively to responses and acknowledge them before moving forward.
-Ask brief follow-up questions if a response is vague or requires more detail.
+Ask only brief clarification follow-ups when a response is vague or requires more detail.
 Keep the conversation flowing smoothly while maintaining control.
 Be professional, yet warm and welcoming:
 
@@ -143,7 +159,7 @@ If unsure, redirect the candidate to HR for more details.
 
 Conclude the interview properly:
 Thank the candidate for their time.
-Inform them that the company will reach out soon with feedback.
+Inform them that the platform will share feedback soon.
 End the conversation on a polite and positive note.
 
 
@@ -154,6 +170,14 @@ End the conversation on a polite and positive note.
     ],
   },
 };
+
+const feedbackCategorySchema = z.enum([
+  "Communication Skills",
+  "Technical Knowledge",
+  "Problem Solving",
+  "Cultural Fit",
+  "Confidence and Clarity",
+]);
 
 export const feedbackSchema = z.object({
   totalScore: z.number(),
@@ -186,6 +210,17 @@ export const feedbackSchema = z.object({
   ]),
   strengths: z.array(z.string()),
   areasForImprovement: z.array(z.string()),
+  weakPoints: z.array(z.object({
+    section: feedbackCategorySchema,
+    issue: z.string(),
+  })),
+  improvementPlan: z.array(z.object({
+    section: feedbackCategorySchema,
+    weakness: z.string(),
+    whyItMatters: z.string(),
+    howToImprove: z.array(z.string()),
+    practiceTask: z.string(),
+  })),
   finalAssessment: z.string(),
 });
 

@@ -1,14 +1,35 @@
+interface CategoryScore {
+  name: string;
+  score: number;
+  comment: string;
+}
+
+interface FeedbackWeakPoint {
+  section: string;
+  issue: string;
+}
+
+interface ImprovementPlanItem {
+  section: string;
+  weakness: string;
+  whyItMatters: string;
+  howToImprove: string[];
+  practiceTask: string;
+}
+
 interface Feedback {
   id: string;
   interviewId: string;
+  userId?: string;
+  role?: string;
+  type?: string;
+  techstack?: string[];
   totalScore: number;
-  categoryScores: Array<{
-    name: string;
-    score: number;
-    comment: string;
-  }>;
+  categoryScores: CategoryScore[];
   strengths: string[];
   areasForImprovement: string[];
+  weakPoints?: FeedbackWeakPoint[];
+  improvementPlan?: ImprovementPlanItem[];
   finalAssessment: string;
   createdAt: string;
 }
@@ -23,6 +44,10 @@ interface Interview {
   userId: string;
   type: string;
   finalized: boolean;
+  source?: string;
+  presetSlug?: string;
+  coverImage?: string;
+  guide?: string;
 }
 
 interface CreateFeedbackParams {
@@ -45,6 +70,7 @@ interface InterviewCardProps {
   type: string;
   techstack: string[];
   createdAt?: string;
+  coverImage?: string;
 }
 
 interface AgentProps {
@@ -69,6 +95,14 @@ interface GetFeedbackByInterviewIdParams {
 interface GetLatestInterviewsParams {
   userId: string;
   limit?: number;
+}
+
+interface DashboardFeedbackItem extends Feedback {
+  role: string;
+  type: string;
+  techstack: string[];
+  weakPoint: string;
+  focusSection: string;
 }
 
 interface SignInParams {
